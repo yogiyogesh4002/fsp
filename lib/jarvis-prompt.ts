@@ -69,7 +69,10 @@ Keep suggestions short (2 to 5 words each) representing logical next questions.`
  * Returns null when nothing usable comes back, which tells the caller to move
  * on to the next model.
  */
-export function parseJarvisJson(raw: string | undefined | null): JarvisAIResponse | null {
+export function parseJarvisJson(
+  raw: string | undefined | null,
+  options: { salvagePlainText?: boolean } = {},
+): JarvisAIResponse | null {
   if (!raw || typeof raw !== "string") return null;
 
   const text = raw.replace(/^\s*```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
@@ -90,7 +93,24 @@ export function parseJarvisJson(raw: string | undefined | null): JarvisAIRespons
       // try the next candidate
     }
   }
+
+  // Some models ignore the JSON instruction and answer in plain prose. A good
+  // prose answer beats falling through to the canned local reply, so it is
+  // salvaged — but only when it looks like an answer rather than a broken
+  // object or an error string.
+  if (options.salvagePlainText && looksLikeProseAnswer(text)) {
+    return { reply: text, suggestions: [] };
+  }
+
   return null;
+}
+
+/** Plain text substantial enough to show, and not a mangled JSON/error blob. */
+function looksLikeProseAnswer(text: string): boolean {
+  if (text.length < 40 || text.length > 4000) return false;
+  if (text.startsWith("{") || text.startsWith("[")) return false;
+  if (/^\s*(error|sorry, (?:an|there was an) error|request failed)\b/i.test(text)) return false;
+  return true;
 }
 
 /** First balanced brace-delimited object in the text, ignoring braces in strings. */

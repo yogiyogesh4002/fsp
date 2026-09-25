@@ -29,9 +29,11 @@ export type OpenRouterModel = {
  * Tanglish, and answering inside the timeout. Override with OPENROUTER_MODELS
  * (comma-separated ids); append `!json` to force JSON mode on for an id.
  *
- * Note: free-model rate limits on OpenRouter are per account, not per model —
- * once the daily ceiling is hit every `:free` id fails together, which is why
- * the loop below stops trying them rather than walking the whole list.
+ * Two different 429s arrive here and they are not the same thing: an
+ * account-level free ceiling downs every `:free` id at once, while an upstream
+ * provider throttle ("google/... is temporarily rate-limited upstream") downs
+ * only that model. The chain must keep walking on the second kind, which is by
+ * far the more common — see isAccountLimit.
  */
 const DEFAULT_MODELS: OpenRouterModel[] = [
   { id: "google/gemma-4-31b-it:free", jsonMode: true },
@@ -43,9 +45,9 @@ const DEFAULT_MODELS: OpenRouterModel[] = [
 ];
 
 /** Per-model request timeout. Kept short because several may be tried in turn. */
-const MODEL_TIMEOUT_MS = 8_000;
-/** Ceiling for the whole chain, so the route always answers promptly. */
-const CHAIN_BUDGET_MS = 20_000;
+const MODEL_TIMEOUT_MS = 6_000;
+/** Ceiling for the whole chain, leaving room for the next provider after it. */
+const CHAIN_BUDGET_MS = 12_000;
 
 function configuredModels(): OpenRouterModel[] {
   const raw = process.env.OPENROUTER_MODELS?.trim();
@@ -87,16 +89,24 @@ export async function generateViaOpenRouter(
     { role: "user", content: message },
   ];
 
+  const models = configuredModels();
   const deadline = Date.now() + CHAIN_BUDGET_MS;
   let freeTierExhausted = false;
 
-  for (const model of configuredModels()) {
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
     if (Date.now() >= deadline) break;
-    // The free ceiling is account-wide, so once one free id is throttled the
-    // rest will be too. Skip them instead of spending the budget on 429s.
+    // An ACCOUNT-level free limit takes every `:free` id down together, so
+    // skip the rest rather than spending the budget collecting 429s. A single
+    // model being throttled upstream does not trigger this — see isAccountLimit.
     if (freeTierExhausted && model.id.endsWith(":free")) continue;
 
-    const outcome = await callModel(apiKey, model, messages, deadline);
+    // Prose is only accepted from a model with no JSON mode, or from the last
+    // model in the chain. Earlier JSON-capable models are given the chance to
+    // answer properly so the suggestion chips survive.
+    const salvage = !model.jsonMode || i === models.length - 1;
+
+    const outcome = await callModel(apiKey, model, messages, deadline, model.jsonMode, salvage);
     if (outcome.reply) return { ...outcome.reply, model: model.id };
     if (outcome.freeTierExhausted) freeTierExhausted = true;
   }
@@ -106,12 +116,36 @@ export async function generateViaOpenRouter(
 
 type Outcome = { reply: JarvisAIResponse | null; freeTierExhausted?: boolean };
 
+/**
+ * Whether a failure means the ACCOUNT's free allowance is spent, as opposed to
+ * one model being busy.
+ *
+ * The distinction matters: an account limit takes every `:free` id down at
+ * once, so there is no point trying the rest. An upstream throttle — which
+ * OpenRouter reports as `provider_name` plus "temporarily rate-limited
+ * upstream" — affects only that model, and the next one in the chain will
+ * usually answer straight away.
+ *
+ * 402 means out of credits, which is always account-level.
+ */
+function isAccountLimit(status: number, detail: string): boolean {
+  if (status === 402) return true;
+  if (status !== 429) return false;
+
+  // Named upstream provider, or the wording OpenRouter uses for it.
+  if (/"provider_name"\s*:\s*"[^"]+"/i.test(detail)) return false;
+  if (/rate-?limited upstream|temporarily rate-?limited|provider returned error/i.test(detail)) return false;
+
+  return true;
+}
+
 async function callModel(
   apiKey: string,
   model: OpenRouterModel,
   messages: { role: string; content: string }[],
   deadline: number,
   allowJsonMode = model.jsonMode,
+  salvagePlainText = false,
 ): Promise<Outcome> {
   const budget = Math.min(MODEL_TIMEOUT_MS, deadline - Date.now());
   if (budget <= 0) return { reply: null };
@@ -147,12 +181,11 @@ async function callModel(
       // The model rejected the JSON parameter — the prompt already asks for
       // JSON, so retry once plainly rather than dropping the model.
       if (allowJsonMode && (response.status === 400 || response.status === 422) && /response_format/i.test(detail)) {
-        return callModel(apiKey, model, messages, deadline, false);
+        return callModel(apiKey, model, messages, deadline, false, salvagePlainText);
       }
 
       console.warn(`OpenRouter ${model.id} -> ${response.status}: ${detail}`);
-      // 429 rate limited, 402 out of credits: the free allowance is spent.
-      return { reply: null, freeTierExhausted: response.status === 429 || response.status === 402 };
+      return { reply: null, freeTierExhausted: isAccountLimit(response.status, detail) };
     }
 
     const data = await response.json();
@@ -162,7 +195,10 @@ async function callModel(
       return { reply: null };
     }
 
-    const parsed = parseJarvisJson(data?.choices?.[0]?.message?.content);
+    // Models without a JSON mode sometimes answer in prose. That is still a
+    // real answer, so accept it rather than dropping through to the canned
+    // local reply; suggestions simply come back empty.
+    const parsed = parseJarvisJson(data?.choices?.[0]?.message?.content, { salvagePlainText });
     if (!parsed) {
       console.warn(`OpenRouter ${model.id} returned no parsable Jarvis JSON.`);
       return { reply: null };

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { processMessage, isGoodbye } from "@/lib/jarvis-engine";
 import { generateJarvisReply, type ChatHistoryItem } from "@/lib/llm";
 
+/**
+ * The provider stack budgets itself to ~20s before handing over to the local
+ * engine; this leaves headroom above that. Vercel clamps it to the plan limit.
+ */
+export const maxDuration = 30;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

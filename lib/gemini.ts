@@ -9,7 +9,8 @@ import {
 // Re-exported so existing importers of these types keep working.
 export type { ChatHistoryItem, JarvisAIResponse };
 
-const TIMEOUT_MS = 12_000;
+const DEFAULT_TIMEOUT_MS = 10_000;
+const MIN_TIMEOUT_MS = 4_000;
 
 /**
  * Google Gemini provider.
@@ -20,6 +21,8 @@ const TIMEOUT_MS = 12_000;
 export async function generateJarvisAIResponse(
   message: string,
   history: ChatHistoryItem[] = [],
+  /** Milliseconds this provider may take. Clamped so it is never pointless. */
+  budgetMs = DEFAULT_TIMEOUT_MS,
 ): Promise<JarvisAIResponse | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -47,7 +50,8 @@ export async function generateJarvisAIResponse(
   };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timeout = Math.max(MIN_TIMEOUT_MS, Math.min(DEFAULT_TIMEOUT_MS, budgetMs));
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
     const response = await fetch(url, {

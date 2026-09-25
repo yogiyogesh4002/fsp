@@ -11,13 +11,25 @@ export type JarvisReply = JarvisAIResponse & {
 
 type ProviderName = "openrouter" | "gemini";
 
-const providers: Record<ProviderName, (m: string, h: ChatHistoryItem[]) => Promise<JarvisReply | null>> = {
+/**
+ * Wall-clock ceiling for the whole provider stack.
+ *
+ * Past this the local engine answers instead, because a chat that takes longer
+ * than this has already lost the user. Each provider is handed the time that
+ * is actually left rather than its own fixed timeout.
+ */
+const TOTAL_BUDGET_MS = 20_000;
+
+const providers: Record<
+  ProviderName,
+  (m: string, h: ChatHistoryItem[], budgetMs: number) => Promise<JarvisReply | null>
+> = {
   openrouter: async (message, history) => {
     const result = await generateViaOpenRouter(message, history);
     return result ? { reply: result.reply, suggestions: result.suggestions, source: `openrouter:${result.model}` } : null;
   },
-  gemini: async (message, history) => {
-    const result = await generateJarvisAIResponse(message, history);
+  gemini: async (message, history, budgetMs) => {
+    const result = await generateJarvisAIResponse(message, history, budgetMs);
     return result ? { ...result, source: "gemini" } : null;
   },
 };
@@ -49,8 +61,13 @@ export async function generateJarvisReply(
   message: string,
   history: ChatHistoryItem[] = [],
 ): Promise<JarvisReply | null> {
+  const deadline = Date.now() + TOTAL_BUDGET_MS;
+
   for (const name of providerOrder()) {
-    const reply = await providers[name](message, history);
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+
+    const reply = await providers[name](message, history, remaining);
     if (reply?.reply) return reply;
   }
   return null;
