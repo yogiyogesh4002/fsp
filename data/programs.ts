@@ -5,7 +5,8 @@ export type EcosystemItem = {
   number: string;
   title: string;
   description: string;
-  href: string;
+  /** Route this node leads to. Omitted for nodes that are a concept, not a page. */
+  href?: string;
 };
 
 export const ecosystem = {
@@ -23,14 +24,17 @@ export const ecosystem = {
       number: "02",
       title: "30 Days Challenge",
       description: "Turn learning into action through 30 practical tasks completed over 30 days.",
-      href: "/30-days-challenge",
+      href: "/programs/30-days-challenge",
     },
     {
-      id: "certification",
+      // Grouping, not a program: node 03 held the Good to Great Certification
+      // in the original source. It now points at the eight official programs
+      // rather than singling one out, which also keeps TTX to node 06.
+      id: "programs",
       number: "03",
-      title: "Good to Great Facilitator",
-      description: "Work towards becoming a Good to Great Facilitator through learning, practice, reflection and continuous improvement.",
-      href: "/certification",
+      title: "FSP Programs & Experiences",
+      description: "The eight FSP programs — each one a different way to build your facilitation practice.",
+      href: "/programs",
     },
     {
       id: "community",
@@ -44,27 +48,165 @@ export const ecosystem = {
       number: "05",
       title: "Masterclasses & Mastermind",
       description: "Keep learning through regular knowledge-sharing sessions and conversations with experienced professionals.",
-      href: "/community#wednesday-masterclass",
+      href: "/programs/fsp-wednesday-masterclass",
     },
     {
       id: "experiences",
       number: "06",
       title: "Experiences & Connections",
-      description: "Participate in Catalyst Connect, TTX, community meetups and other curated learning experiences.",
-      href: "/community#catalyst-connect",
+      description: "Participate in Catalyst Connect, FSP TTX, community meetups and other curated learning experiences.",
+      href: "/events/catalyst-connect",
+    },
+    {
+      // The closing idea of the Core Positioning progression. It is a concept,
+      // not a destination, so it carries no link.
+      id: "continuous-growth",
+      number: "07",
+      title: "Continuous Growth",
+      description: "FSP is not just a course. It is a growth ecosystem — keep learning, create opportunities and continuously develop yourself.",
     },
   ] satisfies EcosystemItem[],
   /** "Core ecosystem" progression from the Core Positioning section. */
   flow: [
     "FSP Core Program",
     "30 Days Challenge",
-    "Good to Great Facilitator Certification",
+    "FSP Programs & Experiences",
     "FSP Community",
     "Masterclasses + Masterminds",
     "Catalyst Connect + TTX + Experiences",
     "Continuous Growth",
   ],
 };
+
+export type ProgramStatus = "practical" | "residential" | "upcoming" | "recurring" | "pending";
+
+export type FspProgram = {
+  id: string;
+  number: string;
+  name: string;
+  /** Short form used by the FSP team, e.g. "FSP 30DC". */
+  abbr: string;
+  href: string;
+  status: ProgramStatus;
+  statusLabel: string;
+  /** Short line for cards and previews. Verified copy, or an honest holding line. */
+  summary: string;
+  /** True when approved detail exists for the page beyond the summary. */
+  hasContent: boolean;
+  /** Shown as a highlighted card on the homepage. */
+  featured?: boolean;
+};
+
+/**
+ * The eight official FSP programs.
+ *
+ * `summary` is verified copy wherever approved material exists. Habit Circle
+ * and Fun Day have no approved material anywhere in the project, so they carry
+ * a holding line and no claims — do not fill these in without source material.
+ *
+ * Catalyst Connect keeps its page under /events because it is run as an event;
+ * it is listed here so the programs hub covers the full ecosystem.
+ */
+export const programs: FspProgram[] = [
+  {
+    id: "30-days-challenge",
+    number: "01",
+    name: "FSP 30 Days Challenge",
+    abbr: "FSP 30DC",
+    href: "/programs/30-days-challenge",
+    status: "practical",
+    statusLabel: "Practical challenge",
+    summary: "30 days. 30 practical tasks. One step forward every day.",
+    hasContent: true,
+    featured: true,
+  },
+  {
+    id: "fsp-ttx",
+    number: "02",
+    name: "FSP TTX",
+    abbr: "FSP TTX",
+    href: "/programs/fsp-ttx",
+    status: "residential",
+    statusLabel: "Residential program",
+    summary: "A transformational residential learning experience away from your routine.",
+    hasContent: true,
+    featured: true,
+  },
+  {
+    id: "fsp-gtx",
+    number: "03",
+    name: "FSP GTX",
+    abbr: "FSP GTX",
+    href: "/programs/fsp-gtx",
+    status: "upcoming",
+    statusLabel: "Upcoming",
+    summary: "An upcoming FSP experience. Details will be announced by the FSP team.",
+    hasContent: false,
+    featured: true,
+  },
+  {
+    id: "fsp-mastermind",
+    number: "04",
+    name: "FSP Mastermind",
+    abbr: "FSP MM",
+    href: "/programs/fsp-mastermind",
+    status: "recurring",
+    statusLabel: "Recurring session",
+    summary: "Conversations that make you think differently.",
+    hasContent: true,
+  },
+  {
+    id: "fsp-wednesday-masterclass",
+    number: "05",
+    name: "FSP Wednesday Masterclass",
+    abbr: "FSP WM",
+    href: "/programs/fsp-wednesday-masterclass",
+    status: "recurring",
+    statusLabel: "Recurring session",
+    summary: "Learn something. Apply something. Every time.",
+    hasContent: true,
+  },
+  {
+    id: "catalyst-connect",
+    number: "06",
+    name: "FSP Catalyst Connect",
+    abbr: "FSP CC",
+    href: "/events/catalyst-connect",
+    status: "recurring",
+    statusLabel: "Community event",
+    summary: "Connect. Learn. Collaborate.",
+    hasContent: true,
+  },
+  {
+    id: "fsp-habit-circle",
+    number: "07",
+    name: "FSP Habit Circle",
+    abbr: "FSP HC",
+    href: "/programs/fsp-habit-circle",
+    status: "pending",
+    statusLabel: "Details to follow",
+    summary: "An FSP program. Details will be shared by the FSP team.",
+    hasContent: false,
+  },
+  {
+    id: "fsp-fun-day",
+    number: "08",
+    name: "FSP Fun Day",
+    abbr: "FSP FD",
+    href: "/programs/fsp-fun-day",
+    status: "pending",
+    statusLabel: "Details to follow",
+    summary: "An FSP program. Details will be shared by the FSP team.",
+    hasContent: false,
+  },
+];
+
+/** The programs highlighted on the homepage. */
+export const featuredPrograms = programs.filter((p) => p.featured);
+
+export function getProgram(id: string): FspProgram | undefined {
+  return programs.find((p) => p.id === id);
+}
 
 export type Module = { number: string; label: string; title: string; topics: string[] };
 
@@ -143,27 +285,6 @@ export const thirtyDays = {
   totalDays: 30,
 };
 
-export const certification = {
-  name: "Good to Great Facilitator Certification",
-  headline: ["From good", "to great."],
-  intro: "A facilitator's journey doesn't end after learning a few techniques. Great facilitation comes through:",
-  cycle: ["Learning", "Practice", "Reflection", "Feedback", "Improvement"],
-  description:
-    "The Good to Great Facilitator Certification is part of the FSP journey and recognises the commitment towards continuous learning, practical application and professional growth.",
-  focusAreas: [
-    "Facilitation skills",
-    "Experiential learning capabilities",
-    "Learning design skills",
-    "Activity facilitation",
-    "Participant engagement",
-    "Training module creation",
-    "Personal branding",
-    "Professional communication",
-    "Continuous improvement",
-  ],
-  close: ["The certificate is a milestone.", "The growth is the journey."],
-};
-
 export type Challenge = { title: string; description: string; href?: string };
 
 export const challenges = {
@@ -176,7 +297,7 @@ export const challenges = {
     {
       title: "30 Days Challenge",
       description: "Complete 30 practical facilitator-focused tasks in 30 days.",
-      href: "/30-days-challenge",
+      href: "/programs/30-days-challenge",
     },
     {
       title: "Book Reading Challenge",

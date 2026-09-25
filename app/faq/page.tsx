@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
   title: "FSP FAQ",
-  description: "Answers to common questions about the Facilitator Support Program: who can join, formats, community, the 30 Days Challenge, certification, resources and how to join.",
+  description: "Answers to common questions about the Facilitator Support Program: who can join, formats, community, the 30 Days Challenge, the programs, resources and how to join.",
   path: "/faq",
 });
 

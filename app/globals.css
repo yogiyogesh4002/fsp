@@ -24,12 +24,33 @@
   --nav-h: 4.25rem;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /**
+   * Display scale anchor.
+   *
+   * The hero headline sizes itself against its own column (17.6cqw ≈ 92% fill),
+   * so its measure changes when the column does: below lg it spans the full
+   * container and works out at ~16.1vw; from lg it moves into a 7/12 track and
+   * works out at ~9.5vw, stopping once the container reaches its max width.
+   *
+   * This variable restates that measure in viewport terms so the rest of the
+   * display scale can be expressed as fixed percentages of the hero and keep
+   * the same ratio at every breakpoint. Do not use it on the hero itself.
+   */
+  --display-hero: 16.1vw;
 }
 
 @media (min-width: 768px) {
   :root {
     --gutter: 2rem;
     --nav-h: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    /* Hero moves into a 7/12 column and caps with the container. */
+    --display-hero: min(9.5vw, 146px);
   }
 }
 @media (min-width: 1280px) {
@@ -153,6 +174,26 @@
 
 @utility text-hero {
   font-size: clamp(3rem, 15.5vw, 12.5rem);
+}
+
+/**
+ * Homepage major display headings — the same size as the hero headline.
+ *
+ * Two bounds, whichever is smaller:
+ *   --display-hero  the hero's own measure, so a heading never reads larger
+ *                   than "Become a facilitator."
+ *   --display-fit   the largest size that still fits the heading's own column,
+ *                   as a percentage of that column (cqw). The default, 17,
+ *                   holds a line of up to ~5.4 characters-width — the length
+ *                   the homepage headings are broken to.
+ *
+ * At every width the hero bound wins on desktop and tablet, so the headings
+ * set at hero size; the fit bound only takes over where a container is
+ * physically too narrow, which keeps long headings from overflowing instead of
+ * shrinking the whole scale. The element must sit inside a query container.
+ */
+@utility text-home-display {
+  font-size: min(var(--display-hero), calc(var(--display-fit, 17) * 1cqw));
 }
 @utility text-mega {
   font-size: clamp(2.75rem, 12vw, 10.5rem);

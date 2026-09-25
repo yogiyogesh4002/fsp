@@ -9,8 +9,13 @@ import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { ChapterNav } from "@/components/fsp/ChapterNav";
 import { EcosystemFlow } from "@/components/fsp/EcosystemFlow";
 import { AudienceCards } from "@/components/fsp/AudienceCards";
+import { Gallery } from "@/components/fsp/Gallery";
+import { TeamSection } from "@/components/fsp/TeamSection";
+import { OrganisationGrid } from "@/components/fsp/OrganisationGrid";
+import { TransformationStory } from "@/components/fsp/TransformationStory";
 import { FinalCTA } from "@/components/fsp/FinalCTA";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { galleryCopy, galleryImages } from "@/data/media";
 
 export const metadata: Metadata = pageMetadata({
   title: "About FSP | Facilitator Support Program",
@@ -125,7 +130,9 @@ export default function AboutPage() {
                   <li key={stage.key} className="flex min-h-56 flex-col justify-between bg-paper p-6 md:p-8">
                     <span className="text-xs font-semibold tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>
                     <div>
-                      <h3 className="font-display text-5xl">{stage.title}</h3>
+                      {/* text-5xl overflows the 3-up cell inside the 9-column
+                          content track at lg; it only fits from xl. */}
+                      <h3 className="font-display text-4xl xl:text-5xl">{stage.title}</h3>
                       <p className="mt-3 text-muted">{stage.description}</p>
                     </div>
                   </li>
@@ -136,7 +143,9 @@ export default function AboutPage() {
             <Chapter id="the-vision" index={5} label="The Vision">
               <TextReveal
                 as="h2"
-                className="font-display text-[clamp(3.25rem,12.5vw,9.5rem)]"
+                // sized against the 9-column content track, not the full page:
+                // 12.5vw pushed "Facilitators." past the column at lg.
+                className="font-display text-[clamp(3.25rem,10.5vw,9.5rem)]"
                 lines={[
                   "To create",
                   <span key="n" className="text-navy">1000</span>,
@@ -162,6 +171,20 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <Gallery
+        slots={galleryImages}
+        eyebrow={galleryCopy.eyebrow}
+        headline={galleryCopy.headline}
+        pending={galleryCopy.pending}
+        index="06"
+      />
+
+      <TeamSection index="07" />
+
+      <OrganisationGrid index="08" />
+
+      <TransformationStory index="09" />
 
       <FinalCTA />
     </>

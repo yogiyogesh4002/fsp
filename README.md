@@ -33,14 +33,33 @@ All copy lives in `data/` and comes from the approved content source (`fsp_conte
 | --- | --- |
 | `data/site.ts` | Navigation, footer links, contact channels (`site.contact` — add approved email/phone to show them) |
 | `data/fsp.ts` | Hero, problem, journey, audiences, numbers, founder, transformation examples, final CTA |
-| `data/programs.ts` | Ecosystem, Core Program modules, 30 Days Challenge, certification, challenges |
+| `data/programs.ts` | Ecosystem, the three main programs (`mainPrograms`), Core Program modules, 30 Days Challenge, challenges |
+| `data/media.ts` | **Image slots and team.** Set `src` + `alt` on a slot to publish an image; append verified people to `team`. Empty slots render as marked placeholders. |
 | `data/community.ts` | Community benefits, Wednesday Masterclass, Mastermind, Catalyst Connect, TTX |
 | `data/events.ts` | **Events** — append to `events` (confirmed details only). Past events drop off automatically; `/events` revalidates hourly. |
 | `data/resources.ts` | **Resources** — append to `resources` (approved files/links only). Search and filters pick them up automatically. |
 | `data/faq.ts` | FAQ (also emitted as FAQPage structured data) |
 | `data/organisations.ts` | Organisation names. Add a `logo` only for approved assets with permission; otherwise names render typographically. |
 
-Founder photo: set `founder.photo` in `data/fsp.ts` once an approved photograph is supplied (place it in `public/images/`).
+Founder photo: set `founder.photo` in `data/fsp.ts` once an approved photograph is supplied (place it in `public/images/`). The founder section lives on `/about-fsp`, not the homepage.
+
+### Site structure
+
+```
+/                           concise introduction + previews
+/about-fsp                  the full FSP story, founder, gallery, team, organisations
+/programs                   the three main programs
+/programs/30-days-challenge
+/programs/fsp-ttx           residential program (awaiting full source material)
+/programs/fsp-gtx           upcoming (awaiting all source material)
+/core-program               Core Program modules (not in the primary nav)
+/community                  community + Wednesday Masterclass + Mastermind
+/events                     events hub
+/events/catalyst-connect
+/resources  /faq  /contact
+```
+
+Each page owns its content. The homepage links to pages rather than repeating them.
 
 Transformation examples are deliberately labelled as examples, not testimonials. Replace them with real member stories only when names and approvals are available.
 

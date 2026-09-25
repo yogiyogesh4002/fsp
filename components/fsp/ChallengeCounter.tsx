@@ -58,7 +58,7 @@ export function ChallengeCounter({ variant = "home", className }: Props) {
               <dt className="sr-only">{label}</dt>
               <dd>
                 <span className="font-display block text-[clamp(2.5rem,6vw,4.5rem)]">{n}</span>
-                <span className="eyebrow mt-2 block text-[0.625rem] tracking-[0.08em] text-on-dark-muted sm:text-xs sm:tracking-[0.16em]">{label}</span>
+                <span className="eyebrow mt-2 block text-[0.625rem] tracking-[0.08em] text-on-dark-muted [overflow-wrap:anywhere] sm:text-xs sm:tracking-[0.16em]">{label}</span>
               </dd>
             </div>
           ))}

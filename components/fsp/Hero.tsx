@@ -13,16 +13,26 @@ import { TrajectoryLines } from "./TrajectoryLines";
  * - Tablet & Mobile: Clean single-column stack (Headline -> Benefits -> CTAs -> Wide Description)
  * - Description: Wide editorial text block spanning ~75-85% of content width on desktop
  * - Safe screen boundaries respecting gutters, viewport, and floating chat widget
+ *
+ * The headline is sized in `cqw` against its own column, not the viewport, so it
+ * fills the same proportion of the column at every width and stops growing when
+ * the container hits its max-width. 17.6cqw ≈ 92% fill: the longest line
+ * ("facilitator.") measures 5.24x its font size in Archivo at this weight/width,
+ * and 0.92 / 5.24 = 0.176. Lines are allowed to wrap so that a wide fallback
+ * font during webfont swap re-flows instead of spilling past the gutter.
  */
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative w-full max-w-full box-border">
       {/* Background trajectory lines contained safely without overflowing page boundaries */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        {/* Below lg the layout is a single column, so the motif sits behind the
+            copy — keep it faint there and only bring it up to full strength at
+            lg+, where it fills the open space beside the headline. */}
         <TrajectoryLines
           spark
           draw
-          className="absolute -right-[40%] bottom-[18%] h-[55%] w-[130%] text-navy/25 md:-right-[6%] md:bottom-[8%] md:h-[80%] md:w-[62%]"
+          className="absolute -right-[40%] bottom-[18%] h-[55%] w-[130%] text-navy/10 md:-right-[6%] md:bottom-[8%] md:h-[80%] md:w-[62%] lg:text-navy/25"
         />
       </div>
 
@@ -41,34 +51,34 @@ export function Hero() {
 
         {/* Main Hero Grid: 2 columns on desktop (lg+), single column on tablet & mobile */}
         <div className="grid-fsp relative pt-6 md:pt-8 lg:pt-10 items-start">
-          {/* Left Column: Headline */}
-          <h1
-            id="hero-title"
-            className="font-display col-span-4 md:col-span-8 lg:col-span-7 text-[clamp(2.5rem,7.5vw,4.5rem)] md:text-[clamp(3.75rem,7vw,5.5rem)] lg:text-[clamp(3.5rem,5.4vw,6.5rem)] xl:text-[clamp(4.25rem,6vw,7.5rem)]"
-          >
-            {hero.headline.map((line, i) => (
-              <span
-                key={line}
-                className="line-mask hero-line"
-                style={{ ["--line-i" as string]: i }}
-              >
-                <span>
-                  {i === hero.headline.length - 1 ? (
-                    <>
-                      {line.slice(0, -1)}
-                      <span className="text-orange">.</span>
-                    </>
-                  ) : (
-                    line
-                  )}
+          {/* Left Column: Headline. The wrapper is the query container the
+              headline sizes itself against. */}
+          <div className="col-span-4 md:col-span-8 lg:col-span-7 [container-type:inline-size]">
+            <h1 id="hero-title" className="font-display text-[max(2.5rem,17.6cqw)]">
+              {hero.headline.map((line, i) => (
+                <span
+                  key={line}
+                  className="line-mask hero-line"
+                  style={{ ["--line-i" as string]: i }}
+                >
+                  <span>
+                    {i === hero.headline.length - 1 ? (
+                      <>
+                        {line.slice(0, -1)}
+                        <span className="text-orange">.</span>
+                      </>
+                    ) : (
+                      line
+                    )}
+                  </span>
                 </span>
-              </span>
-            ))}
-          </h1>
+              ))}
+            </h1>
+          </div>
 
           {/* Right Column: Numbered benefits + CTA buttons */}
           <div
-            className="hero-fade col-span-4 md:col-span-8 lg:col-span-5 mt-8 md:mt-10 lg:mt-2 lg:pl-4 xl:pl-8"
+            className="hero-fade col-span-4 md:col-span-8 lg:col-span-5 mt-8 md:mt-10 lg:mt-3"
             style={{ ["--fade-i" as string]: 1 }}
           >
             <p className="sr-only">
@@ -84,7 +94,9 @@ export function Hero() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 sm:mt-7 flex flex-wrap items-center gap-x-6 sm:gap-x-7 gap-y-3.5">
+            {/* gap tightens at lg so both CTAs stay on one row in the narrower
+                5-column track (they wrapped at exactly 1024px before). */}
+            <div className="mt-6 sm:mt-7 flex flex-wrap items-center gap-x-6 sm:gap-x-7 lg:gap-x-5 xl:gap-x-7 gap-y-3.5">
               <Button href={joinHref} size="lg">
                 {hero.cta.primary}
               </Button>

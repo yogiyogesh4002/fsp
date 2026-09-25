@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { breadcrumbJsonLd, pageMetadata, absoluteUrl } from "@/lib/seo";
 import { site, joinHref } from "@/data/site";
-import { coreProgram, ecosystem } from "@/data/programs";
+import { coreProgram, ecosystem, type EcosystemItem } from "@/data/programs";
 import { PageHero } from "@/components/ui/PageHero";
 import { Button } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -29,7 +29,12 @@ const courseLd = {
 };
 
 export default function CoreProgramPage() {
-  const next = ecosystem.items.filter((i) => i.id === "challenge" || i.id === "certification" || i.id === "community");
+  // "certification" was a Good to Great node and no longer exists; the
+  // programs grouping takes its place so the three-up grid stays full.
+  const next = ecosystem.items.filter(
+    (i): i is EcosystemItem & { href: string } =>
+      i.href !== undefined && (i.id === "challenge" || i.id === "programs" || i.id === "community"),
+  );
 
   return (
     <>

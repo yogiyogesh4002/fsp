@@ -9,6 +9,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TextReveal } from "@/components/motion/TextReveal";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { ChallengeCounter } from "@/components/fsp/ChallengeCounter";
+import { Gallery } from "@/components/fsp/Gallery";
+import { imagesFor } from "@/data/media";
 import { FinalCTA } from "@/components/fsp/FinalCTA";
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
@@ -16,13 +18,18 @@ import { Arrow } from "@/components/ui/Arrow";
 export const metadata: Metadata = pageMetadata({
   title: "FSP 30 Days Challenge | 30 Days. 30 Tasks. One Better Facilitator.",
   description: `${thirtyDays.statement} ${thirtyDays.description}`,
-  path: "/30-days-challenge",
+  path: "/programs/30-days-challenge",
 });
 
 export default function ThirtyDaysPage() {
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd([{ name: "30 Days Challenge", path: "/30-days-challenge" }])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Programs", path: "/programs" },
+          { name: "30 Days Challenge", path: "/programs/30-days-challenge" },
+        ])}
+      />
       <PageHero
         eyebrow="FSP 30 Days Challenge"
         size="mega"
@@ -122,7 +129,7 @@ export default function ThirtyDaysPage() {
                 <span className="text-xs font-semibold tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-10 text-2xl font-semibold tracking-tight">{c.title}</h3>
                 <p className="mt-3 text-muted">{c.description}</p>
-                {c.href && c.href !== "/30-days-challenge" && (
+                {c.href && c.href !== "/programs/30-days-challenge" && (
                   <Link href={c.href} className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]">
                     Explore <Arrow />
                   </Link>
@@ -132,6 +139,14 @@ export default function ThirtyDaysPage() {
           </ul>
         </div>
       </section>
+
+      <Gallery
+        slots={imagesFor("30-days-challenge")}
+        eyebrow="30 Days Challenge"
+        headline={["Inside the", "challenge."]}
+        pending="Images from the 30 Days Challenge will appear here."
+        tone="light"
+      />
 
       <FinalCTA showBelief={false} />
     </>

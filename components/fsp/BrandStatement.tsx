@@ -34,7 +34,8 @@ export function BrandStatement() {
 
   return (
     <section ref={ref} aria-labelledby="brand-title" className="tone-navy relative overflow-hidden">
-      <div className="container-fsp relative py-24 md:py-36">
+      {/* query container for text-home-display */}
+      <div className="container-fsp relative py-24 md:py-36 [container-type:inline-size]">
         <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 md:gap-x-5" aria-label="The FSP journey">
           {journey.map((stage, i) => (
             <li key={stage.key} data-brand-stage className="eyebrow flex items-center gap-3 text-on-dark-muted md:gap-5">
@@ -44,7 +45,12 @@ export function BrandStatement() {
           ))}
         </ol>
 
-        <h2 id="brand-title" className="font-display mt-12 text-[clamp(4.25rem,21vw,19rem)] leading-[0.82] md:mt-16">
+        {/* Hero size. Single words, so the fit bound never binds. */}
+        <h2
+          id="brand-title"
+          className="font-display mt-12 text-home-display leading-[0.82] md:mt-16"
+          style={{ ["--display-fit" as string]: 25 }}
+        >
           <span data-brand-word className="block origin-left">Learn<span className="text-orange">.</span></span>
           <span data-brand-word className="block origin-left md:pl-[18%]">Lead<span className="text-orange">.</span></span>
           <span data-brand-word className="block origin-left md:pl-[8%]">Impact<span className="text-orange">.</span></span>

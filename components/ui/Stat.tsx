@@ -50,7 +50,9 @@ export function Stat({ item, className }: { item: StatItem; className?: string }
     <div className={cn("flex flex-col", className)}>
       <p
         ref={ref}
-        className={cn("font-display tabular-nums", isWords ? "text-[clamp(2.25rem,4vw,3.75rem)]" : "whitespace-nowrap text-[clamp(3.5rem,7.4vw,7.5rem)]")}
+        // Word statistics ("India + International") sit in a third of the grid,
+        // so they scale more slowly than numeric ones to stay inside the cell.
+        className={cn("font-display tabular-nums", isWords ? "text-[clamp(1.75rem,3.4vw,3.5rem)]" : "whitespace-nowrap text-[clamp(3.5rem,7.4vw,7.5rem)]")}
       >
         <span className="sr-only">{item.display}</span>
         <span aria-hidden="true">{text}</span>

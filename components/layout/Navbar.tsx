@@ -86,7 +86,9 @@ export function Navbar() {
           showSolid ? "border-b border-line bg-paper/90 backdrop-blur-md" : "border-b border-transparent bg-transparent",
         )}
       >
-        <nav ref={navRef} aria-label="Primary" className="container-fsp flex h-[var(--nav-h)] items-center justify-between gap-6">
+        {/* gap tightens below 400px: logo + Join FSP + menu button overflowed a
+            320px viewport at gap-6 and gave the page a horizontal scrollbar. */}
+        <nav ref={navRef} aria-label="Primary" className="container-fsp flex h-[var(--nav-h)] items-center justify-between gap-3 xs:gap-6">
           <Link href="/" className="relative z-10 block w-[92px] shrink-0 md:w-[112px]" aria-label="FSP home">
             <Logo priority sizes="112px" />
           </Link>
@@ -178,8 +180,11 @@ function DropdownItem({
   linkClass: string;
 }) {
   const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const active = item.children.some((c) => isActive(pathname, c.href));
+  const active =
+    item.children.some((c) => isActive(pathname, c.href)) ||
+    (item.footer ? isActive(pathname, item.footer.href) : false);
   const panelId = `menu-${item.label.toLowerCase()}`;
+  const twoCol = item.columns === 2;
 
   return (
     <li
@@ -219,24 +224,42 @@ function DropdownItem({
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="absolute left-0 top-full pt-2"
           >
-            <ul className="min-w-[20rem] border border-line bg-white p-2 shadow-[0_24px_60px_-24px_rgb(16_19_28/0.25)]">
-              {item.children.map((child, i) => (
-                <li key={child.href}>
-                  <Link
-                    href={child.href}
-                    className="group/item grid grid-cols-[2rem_1fr_auto] items-center gap-2 px-3 py-3 transition-colors hover:bg-paper"
-                    aria-current={pathname === child.href ? "page" : undefined}
-                  >
-                    <span className="text-[0.6875rem] font-semibold tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>
-                    <span>
-                      <span className="block text-sm font-semibold text-ink">{child.label}</span>
-                      {child.description && <span className="block text-xs text-muted">{child.description}</span>}
-                    </span>
-                    <Arrow className="text-sm text-navy opacity-0 transition-all duration-300 group-hover/item:opacity-100 group-focus-visible/item:opacity-100" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div
+              className={cn(
+                "border border-line bg-white p-2 shadow-[0_24px_60px_-24px_rgb(16_19_28/0.25)]",
+                twoCol ? "w-[40rem] max-w-[calc(100vw-2*var(--gutter))]" : "min-w-[20rem]",
+              )}
+            >
+              <ul className={cn(twoCol && "grid grid-cols-2 gap-x-1")}>
+                {item.children.map((child, i) => (
+                  <li key={child.href}>
+                    <Link
+                      href={child.href}
+                      className="group/item grid grid-cols-[2rem_1fr_auto] items-center gap-2 px-3 py-3 transition-colors hover:bg-paper"
+                      aria-current={pathname === child.href ? "page" : undefined}
+                    >
+                      <span className="text-[0.6875rem] font-semibold tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-ink">{child.label}</span>
+                        {child.description && <span className="block text-xs text-muted">{child.description}</span>}
+                      </span>
+                      <Arrow className="text-sm text-navy opacity-0 transition-all duration-300 group-hover/item:opacity-100 group-focus-visible/item:opacity-100" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {item.footer && (
+                <Link
+                  href={item.footer.href}
+                  className="group/all mt-1 flex items-center justify-between gap-2 border-t border-line px-3 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-navy transition-colors hover:bg-paper"
+                  aria-current={pathname === item.footer.href ? "page" : undefined}
+                >
+                  {item.footer.label}
+                  <Arrow className="text-sm transition-transform duration-300 group-hover/all:-translate-y-0.5 group-hover/all:translate-x-0.5" />
+                </Link>
+              )}
+            </div>
           </m.div>
         )}
       </AnimatePresence>

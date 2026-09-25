@@ -19,10 +19,11 @@ export const experienceLevels = [
 export const lookingForOptions = [
   "FSP Core Program",
   "30 Days Challenge",
-  "Good to Great Facilitator Certification",
+  "FSP TTX",
+  "FSP GTX",
   "FSP Community",
   "Masterclasses & Mastermind",
-  "Catalyst Connect / TTX / Experiences",
+  "Catalyst Connect / Experiences",
   "Something else",
 ] as const;
 

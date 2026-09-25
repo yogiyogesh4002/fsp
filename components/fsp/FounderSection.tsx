@@ -1,14 +1,25 @@
-import Image from "next/image";
 import { founder } from "@/data/fsp";
+import { founderImages } from "@/data/media";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ImageSlot } from "@/components/ui/ImageSlot";
 import { TextReveal } from "@/components/motion/TextReveal";
 
-type Props = { index?: string; showCredentials?: boolean; headingLevel?: "h2" | "h3" };
+type Props = { index?: string; showCredentials?: boolean; headingLevel?: "h2" | "h3"; showImages?: boolean };
 
-/** Founder: typographic portrait, approved bio, credentials and the FSP vision. */
-export function FounderSection({ index, showCredentials = true, headingLevel = "h2" }: Props) {
+/**
+ * Founder: portrait, approved bio, credentials and the FSP vision.
+ *
+ * Lives on the About FSP page. The portrait comes from `founder.photo` when an
+ * approved photograph has been supplied; until then the slot renders a marked
+ * placeholder at the final size, so the layout does not move later.
+ */
+export function FounderSection({ index, showCredentials = true, headingLevel = "h2", showImages = true }: Props) {
+  const [portrait, secondary] = founderImages;
+  // `founder.photo` stays the single source of truth for the portrait.
+  const portraitSlot = { ...portrait, src: founder.photo ?? undefined, alt: founder.photo ? founder.name : undefined };
+  // id is the link target for the homepage founder preview.
   return (
-    <section aria-labelledby="founder-title" className="section-pad bg-white">
+    <section id="founder" aria-labelledby="founder-title" className="section-pad bg-white">
       <div className="container-fsp grid-fsp gap-y-14">
         <div className="col-span-4 md:col-span-8 lg:col-span-5">
           <Eyebrow index={index} className="mb-8">Meet the founder</Eyebrow>
@@ -25,9 +36,10 @@ export function FounderSection({ index, showCredentials = true, headingLevel = "
               </li>
             ))}
           </ul>
-          {founder.photo && (
-            <div className="relative mt-10 aspect-[4/5] w-full max-w-sm overflow-hidden bg-stone">
-              <Image src={founder.photo} alt={founder.name} fill sizes="(min-width: 1024px) 24rem, 100vw" className="object-cover" />
+          {showImages && (
+            <div className="mt-10 max-w-sm space-y-4">
+              <ImageSlot slot={portraitSlot} sizes="(min-width: 1024px) 24rem, 100vw" />
+              {secondary && <ImageSlot slot={secondary} sizes="(min-width: 1024px) 24rem, 100vw" />}
             </div>
           )}
         </div>

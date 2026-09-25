@@ -20,7 +20,9 @@ export function AudienceCards() {
               {String(i + 1).padStart(2, "0")}
             </span>
             <h3
-              className={`font-display col-span-3 text-[clamp(2.25rem,7.4vw,6.5rem)] transition-colors duration-500 group-hover:text-navy md:col-span-7 lg:col-span-7 ${i % 2 ? "lg:col-start-3" : "lg:col-start-2"}`}
+              // 1.75rem floor: 2.25rem no longer fits "Professionals" inside the
+              // 3-column track on a 320px screen.
+              className={`font-display col-span-3 text-[clamp(1.75rem,7.4vw,6.5rem)] transition-colors duration-500 group-hover:text-navy md:col-span-7 lg:col-span-7 ${i % 2 ? "lg:col-start-3" : "lg:col-start-2"}`}
             >
               {audience.title}
             </h3>

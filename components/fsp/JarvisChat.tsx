@@ -13,7 +13,7 @@ export function JarvisChat({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi there! 👋 Welcome to FSP. I'm Jarvis, your AI guide. Ask me about FSP programs, certification, community, or how to join!",
+      content: "Hi there! 👋 Welcome to FSP. I'm Jarvis, your AI guide. Ask me about FSP programs, the Core Program, community, or how to join!",
     },
   ]);
   const [input, setInput] = useState("");

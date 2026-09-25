@@ -48,29 +48,42 @@ export const site = {
 } as const;
 
 export type NavLink = { label: string; href: string; description?: string };
-export type NavItem = NavLink | { label: string; children: NavLink[] };
+export type NavDropdown = {
+  label: string;
+  children: NavLink[];
+  /** Render the panel in two columns — keeps a long list from running down the screen. */
+  columns?: 2;
+  /** Optional link to the hub page for the whole section. */
+  footer?: NavLink;
+};
+export type NavItem = NavLink | NavDropdown;
 
 export const primaryNav: NavItem[] = [
   { label: "About FSP", href: "/about-fsp" },
   {
     label: "Programs",
+    // All eight official FSP programs, in two columns so the panel stays compact.
+    columns: 2,
+    footer: { label: "All programs", href: "/programs" },
     children: [
-      { label: "Core Program", href: "/core-program", description: "Build your foundation" },
-      { label: "30 Days Challenge", href: "/30-days-challenge", description: "30 days. 30 tasks." },
-      { label: "Good to Great Certification", href: "/certification", description: "From good to great" },
+      { label: "30 Days Challenge", href: "/programs/30-days-challenge", description: "30 days. 30 tasks." },
+      { label: "FSP TTX", href: "/programs/fsp-ttx", description: "Residential experience" },
+      { label: "FSP GTX", href: "/programs/fsp-gtx", description: "Upcoming experience" },
+      { label: "FSP Mastermind", href: "/programs/fsp-mastermind", description: "Think differently" },
+      { label: "Wednesday Masterclass", href: "/programs/fsp-wednesday-masterclass", description: "Learn. Apply. Every time." },
+      { label: "FSP Catalyst Connect", href: "/events/catalyst-connect", description: "Connect. Learn. Collaborate." },
+      { label: "FSP Habit Circle", href: "/programs/fsp-habit-circle", description: "Details to follow" },
+      { label: "FSP Fun Day", href: "/programs/fsp-fun-day", description: "Details to follow" },
     ],
   },
+  { label: "Community", href: "/community" },
   {
-    label: "Community",
+    label: "Events",
     children: [
-      { label: "FSP Community", href: "/community", description: "You don't have to grow alone" },
-      { label: "Wednesday Masterclass", href: "/community#wednesday-masterclass", description: "Learn something. Apply something." },
-      { label: "FSP Mastermind", href: "/community#mastermind", description: "Conversations that make you think" },
-      { label: "Catalyst Connect", href: "/community#catalyst-connect", description: "Connect. Learn. Collaborate." },
-      { label: "FSP TTX", href: "/community#ttx", description: "2-day residential experience" },
+      { label: "All Events", href: "/events", description: "What's happening inside FSP" },
+      { label: "FSP Catalyst Connect", href: "/events/catalyst-connect", description: "Connect. Learn. Collaborate." },
     ],
   },
-  { label: "Events", href: "/events" },
   { label: "Resources", href: "/resources" },
   { label: "FAQ", href: "/faq" },
 ];
@@ -83,16 +96,20 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
     heading: "Programs",
     links: [
       { label: "About FSP", href: "/about-fsp" },
-      { label: "Core Program", href: "/core-program" },
-      { label: "30 Days Challenge", href: "/30-days-challenge" },
-      { label: "Certification", href: "/certification" },
+      { label: "30 Days Challenge", href: "/programs/30-days-challenge" },
+      { label: "FSP TTX", href: "/programs/fsp-ttx" },
+      { label: "FSP GTX", href: "/programs/fsp-gtx" },
     ],
   },
   {
     heading: "Community",
     links: [
       { label: "FSP Community", href: "/community" },
+      { label: "FSP Mastermind", href: "/programs/fsp-mastermind" },
+      { label: "Wednesday Masterclass", href: "/programs/fsp-wednesday-masterclass" },
+      { label: "Catalyst Connect", href: "/events/catalyst-connect" },
       { label: "Events", href: "/events" },
+      { label: "Gallery", href: "/gallery" },
       { label: "Resources", href: "/resources" },
     ],
   },

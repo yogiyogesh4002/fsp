@@ -139,13 +139,17 @@ export function Ecosystem() {
                 <p className="font-display text-[clamp(4.5rem,12vw,9rem)] text-navy">{current.number}</p>
                 <h3 className="mt-4 text-[clamp(1.75rem,3.4vw,2.75rem)] font-semibold leading-[1.05] tracking-tight">{current.title}</h3>
                 <p className="mt-5 max-w-md text-lede text-muted">{current.description}</p>
-                <Link
-                  href={current.href}
-                  className="group/l mt-8 inline-flex min-h-11 items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] underline-offset-[6px] hover:underline"
-                >
-                  Explore {current.title}
-                  <Arrow className="transition-transform group-hover/l:-translate-y-0.5 group-hover/l:translate-x-0.5" />
-                </Link>
+                {/* The closing node is a concept rather than a page, so it
+                    carries no link. */}
+                {current.href && (
+                  <Link
+                    href={current.href}
+                    className="group/l mt-8 inline-flex min-h-11 items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] underline-offset-[6px] hover:underline"
+                  >
+                    Explore {current.title}
+                    <Arrow className="transition-transform group-hover/l:-translate-y-0.5 group-hover/l:translate-x-0.5" />
+                  </Link>
+                )}
               </m.div>
             </AnimatePresence>
           </div>

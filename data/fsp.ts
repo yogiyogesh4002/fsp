@@ -114,8 +114,8 @@ export const founder = {
     "1 lakh+ people trained",
     "Experience with corporate, institutional and community learning programs",
   ],
-  /** Add an approved photograph path (e.g. "/images/founder.jpg") when supplied. */
-  photo: null as string | null,
+  /** Approved photograph. Drives the portrait slot on the homepage and About FSP. */
+  photo: "/images/karunai-prakash-portrait.jpg" as string | null,
 };
 
 export type TransformationExample = { before: string; after: string };

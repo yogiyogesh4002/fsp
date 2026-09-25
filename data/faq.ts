@@ -20,10 +20,6 @@ export const faq: FaqItem[] = [
     answer: "It is a practical 30-day journey where participants complete one focused task each day.",
   },
   {
-    question: "What is Good to Great Facilitator?",
-    answer: "It is the FSP certification journey designed around learning, practice, reflection and continuous improvement.",
-  },
-  {
     question: "Will I get resources?",
     answer: "Yes. FSP provides practical resources, templates, activities and learning materials.",
   },

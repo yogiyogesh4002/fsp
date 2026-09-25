@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processMessage, isGoodbye } from "@/lib/jarvis-engine";
-import { generateJarvisAIResponse, ChatHistoryItem } from "@/lib/gemini";
+import { generateJarvisReply, type ChatHistoryItem } from "@/lib/llm";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,18 +14,20 @@ export async function POST(request: NextRequest) {
 
     const goodbye = isGoodbye(message);
 
-    // 1. Attempt generation via Gemini AI
-    const aiResponse = await generateJarvisAIResponse(message, history);
+    // 1. Attempt generation via the configured providers (OpenRouter model
+    //    chain, then Gemini). Each returns null rather than throwing.
+    const aiResponse = await generateJarvisReply(message, history);
     if (aiResponse && aiResponse.reply) {
       return NextResponse.json({
         reply: aiResponse.reply,
         suggestions: aiResponse.suggestions || [],
         goodbye,
-        source: "gemini",
+        source: aiResponse.source,
       });
     }
 
-    // 2. Seamless fallback to local deterministic engine if Gemini is unavailable
+    // 2. Seamless fallback to local deterministic engine if every provider is
+    //    unavailable, so the chatbot always answers.
     const fallbackResponse = processMessage(message);
     return NextResponse.json({
       reply: fallbackResponse.reply,

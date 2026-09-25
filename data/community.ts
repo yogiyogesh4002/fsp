@@ -29,6 +29,15 @@ export type CommunityExperience = {
   close?: string;
 };
 
+/**
+ * Source of truth for the four community experiences. Each one now has its own
+ * program page (Wednesday Masterclass, Mastermind, Catalyst Connect, TTX), so
+ * the Community page links to them instead of repeating their content.
+ */
+export function getExperience(id: string): CommunityExperience | undefined {
+  return experiences.find((e) => e.id === id);
+}
+
 export const experiences: CommunityExperience[] = [
   {
     id: "wednesday-masterclass",

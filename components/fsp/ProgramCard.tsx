@@ -30,7 +30,9 @@ export function ProgramCards({ modules }: { modules: Module[] }) {
                 {mod.number}
               </p>
             </div>
-            <h3 className="mt-10 text-[clamp(1.75rem,2.6vw,2.375rem)] font-semibold leading-[1.02] tracking-tight md:mt-auto md:pt-16">
+            {/* break-anywhere is the backstop for long single words such as
+                "Opportunities", which overflowed the card at tablet width. */}
+            <h3 className="mt-10 text-[clamp(1.625rem,2.6vw,2.375rem)] font-semibold leading-[1.02] tracking-tight [overflow-wrap:anywhere] md:mt-auto md:pt-16">
               {mod.title}
             </h3>
             <ul className={cn("mt-6 flex flex-wrap gap-x-1 text-sm leading-relaxed", i === 0 ? "text-muted" : "text-on-dark-muted")}>
